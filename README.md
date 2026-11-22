@@ -2,6 +2,10 @@
 
 A high-performance browser extension that scans, previews, filters, and downloads images from any webpage—individually or bundled in a single ZIP archive.
 
+<p align="center">
+  <img src="tuto-video.gif" alt="Image Downloader Demo" width="100%" />
+</p>
+
 ---
 
 ## Key Features
@@ -51,6 +55,7 @@ imageDownloader/
 ├── manifest.json         # Extension Manifest V3 configuration
 ├── background.js         # Service worker for downloads and cross-origin fetch
 ├── content.js            # DOM image extractor and infinite-scroll scanner
+├── tuto-video.gif        # Extension walkthrough demo preview
 ├── icons/                # Extension icons (16px, 32px, 48px, 128px, SVG)
 │   ├── icon-16.png
 │   ├── icon-32.png
