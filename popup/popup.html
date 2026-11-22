@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Downloader</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <img src="../icons/icon-32.png" width="28" height="28" alt="Logo" class="brand-img" />
+        </div>
+        <div class="brand-text">
+          <h1>Image Downloader</h1>
+          <span id="pageDomain" class="page-domain" title="Current tab domain">Scanning...</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="deepScanBtn" class="btn btn-secondary btn-sm" title="Auto-scroll the page to uncover lazy-loaded images">
+          <svg id="scanIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          <span id="deepScanText">Deep Scan</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Stats and Selection Bar -->
+    <section class="toolbar-section">
+      <div class="count-indicator" id="countIndicator">
+        <span class="count-main">
+          Selected: <strong id="selectedCount">0</strong> / <span id="displayedCount">0</span>
+        </span>
+        <span class="count-sub" id="totalStats">Total: 0 found</span>
+      </div>
+
+      <div class="selection-actions">
+        <button id="selectAllBtn" class="btn-text">Select All</button>
+        <span class="action-divider">|</span>
+        <button id="deselectAllBtn" class="btn-text">Deselect All</button>
+        <span class="action-divider">|</span>
+        <button id="invertSelectionBtn" class="btn-text">Invert</button>
+      </div>
+    </section>
+
+    <!-- Filters Panel -->
+    <section class="filters-section">
+      <!-- Format filters -->
+      <div class="filter-row">
+        <span class="filter-label">Format:</span>
+        <div class="format-chips" id="formatChips">
+          <button class="chip active" data-format="all">All</button>
+          <button class="chip" data-format="jpg">JPG</button>
+          <button class="chip" data-format="png">PNG</button>
+          <button class="chip" data-format="webp">WEBP</button>
+          <button class="chip" data-format="gif">GIF</button>
+          <button class="chip" data-format="svg">SVG</button>
+          <button class="chip" data-format="other">Other</button>
+        </div>
+      </div>
+
+      <!-- Resolution & Duplicate filter -->
+      <div class="filter-row wrap-row">
+        <div class="resolution-controls">
+          <span class="filter-label">Min Size:</span>
+          <select id="resPresetSelect" class="select-sm">
+            <option value="0">All Sizes</option>
+            <option value="150">&gt; 150px (No icons)</option>
+            <option value="300">&gt; 300px (Medium)</option>
+            <option value="600">&gt; 600px (Large)</option>
+            <option value="1080">&gt; 1080px (HD)</option>
+            <option value="custom">Custom (W × H)</option>
+          </select>
+
+          <div id="customResInputs" class="custom-res-inputs hidden">
+            <input type="number" id="minWidthInput" placeholder="Min W" min="0" step="50" class="input-xs" />
+            <span class="input-sep">×</span>
+            <input type="number" id="minHeightInput" placeholder="Min H" min="0" step="50" class="input-xs" />
+            <span class="input-unit">px</span>
+          </div>
+        </div>
+
+        <div class="duplicate-toggle">
+          <label class="toggle-label" title="Hide duplicate images and variations">
+            <input type="checkbox" id="hideDuplicatesCheckbox" checked />
+            <span class="toggle-custom"></span>
+            <span class="toggle-text">Hide Duplicates</span>
+            <span id="dupCountBadge" class="badge-pill hidden">0</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings Bar (Folder & Smart Renaming) -->
+    <details class="settings-details">
+      <summary class="settings-summary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span>Download Options & File Renaming</span>
+      </summary>
+      <div class="settings-content">
+        <div class="setting-item">
+          <label for="folderInput" class="setting-label">Download Subfolder:</label>
+          <div class="folder-input-wrapper">
+            <span class="folder-prefix">Downloads/</span>
+            <input type="text" id="folderInput" class="input-text" placeholder="images" value="images" />
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <label for="renameSelect" class="setting-label">Intelligent Rename:</label>
+          <select id="renameSelect" class="select-text">
+            <option value="original">Original Filename (Cleaned)</option>
+            <option value="image_index">image_{index} (e.g. image_001.jpg)</option>
+            <option value="page_index">{pageTitle}_{index}</option>
+            <option value="domain_index">{domain}_{index}</option>
+            <option value="custom">Custom Pattern...</option>
+          </select>
+        </div>
+
+        <div id="customPatternWrapper" class="setting-item hidden">
+          <label for="customPatternInput" class="setting-label">Custom Pattern:</label>
+          <input type="text" id="customPatternInput" class="input-text" placeholder="{name}_{width}x{height}" value="{name}_{index}" />
+          <div class="pattern-hint">Tokens: {name}, {index}, {pageTitle}, {domain}, {width}, {height}, {ext}</div>
+        </div>
+      </div>
+    </details>
+
+    <!-- Image Preview Grid -->
+    <main class="grid-container" id="gridContainer">
+      <div id="imageGrid" class="image-grid"></div>
+
+      <!-- Empty / Loading State -->
+      <div id="gridState" class="grid-state">
+        <div class="spinner" id="gridSpinner"></div>
+        <p id="gridStateText">Scanning page for images...</p>
+      </div>
+    </main>
+
+    <!-- Progress Notification Bar -->
+    <div id="progressBanner" class="progress-banner hidden">
+      <div class="progress-info">
+        <span id="progressText">Processing...</span>
+        <span id="progressPercent">0%</span>
+      </div>
+      <div class="progress-track">
+        <div id="progressBar" class="progress-fill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <footer class="app-footer">
+      <div class="footer-status" id="footerStatus">
+        Ready
+      </div>
+
+      <div class="footer-buttons">
+        <button id="downloadZipBtn" class="btn btn-secondary" title="Download all selected images packed in a single ZIP file">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+          <span>Download as ZIP</span>
+        </button>
+
+        <button id="downloadSelectedBtn" class="btn btn-primary" title="Download selected images to your download folder">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span id="downloadBtnText">Download Selected</span>
+        </button>
+      </div>
+    </footer>
+
+    <!-- Full Image Preview Lightbox Modal -->
+    <div id="lightboxModal" class="lightbox-modal hidden">
+      <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+      <div class="lightbox-content">
+        <button id="lightboxCloseBtn" class="lightbox-close" title="Close preview">&times;</button>
+        <div class="lightbox-image-container">
+          <img id="lightboxImg" src="" alt="Full Preview" />
+        </div>
+        <div class="lightbox-meta">
+          <div class="lightbox-meta-main">
+            <span id="lightboxResolution" class="lightbox-badge">0 × 0</span>
+            <span id="lightboxFormat" class="lightbox-badge format-badge">JPG</span>
+            <span id="lightboxType" class="lightbox-badge type-badge">img</span>
+            <span id="lightboxFilename" class="lightbox-filename">filename.jpg</span>
+          </div>
+          <div class="lightbox-actions">
+            <a id="lightboxOpenUrl" href="#" target="_blank" class="btn-text-sm">Open Original &#8599;</a>
+            <button id="lightboxDownloadBtn" class="btn btn-primary btn-sm">Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="jszip.min.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
