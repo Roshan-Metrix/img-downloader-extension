@@ -3,7 +3,15 @@
 A high-performance browser extension that scans, previews, filters, and downloads images from any webpage—individually or bundled in a single ZIP archive.
 
 <p align="center">
-  <img src="tuto-video.gif" alt="Image Downloader Demo" width="100%" />
+  <img src="tuto-video.gif" alt="Image Downloader Demo" width="40%" />
+</p>
+
+<p align="center">
+  <a href="https://youtu.be/zHG50azl5eo" target="_blank">
+    <img src="https://img.shields.io/badge/YouTube-Watch%20Tutorial-red?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch Video Tutorial on YouTube" />
+  </a>
+  <br />
+  <span>📺 <em>Watch the full step-by-step video tutorial:</em> <a href="https://youtu.be/zHG50azl5eo"><strong>https://youtu.be/zHG50azl5eo</strong></a></span>
 </p>
 
 ---
