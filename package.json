@@ -1,0 +1,20 @@
+{
+  "name": "image-downloader-extension",
+  "version": "1.1.0",
+  "description": "Chrome Extension (Manifest V3) to preview, filter, and download webpage images individually or as a ZIP archive",
+  "private": true,
+  "scripts": {
+    "test": "node tests/validate.js",
+    "lint": "node --check background.js content.js popup/popup.js",
+    "package": "node scripts/package.js"
+  },
+  "keywords": [
+    "chrome-extension",
+    "manifest-v3",
+    "image-downloader",
+    "zip",
+    "jszip"
+  ],
+  "author": "Image Downloader Contributors",
+  "license": "MIT"
+}
